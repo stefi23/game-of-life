@@ -8,13 +8,52 @@ class Main extends React.Component {
   constructor() {
     super();
     this.speed = 100;
-    (this.rows = 30), (this.cols = 50);
+    this.rows = 30;
+    this.cols = 50;
     this.state = {
       generation: 0,
       gridFull: Array(this.rows)
         .fill()
-        .map(() => Arrray(this.cols).fill(false)),
+        .map(() => Array(this.cols).fill(false)),
     };
+  }
+
+  selectBox = (row, col) => {
+    let gridCopy = arrayClone(this.state.gridFull);
+    gridCopy[row][col] = !gridCopy[row][col];
+    this.setState({
+      gridFull: gridCopy,
+    });
+  };
+
+  seed = () => {
+    console.log("seed");
+    let gridCopy = arrayClone(this.state.gridFull);
+    for (let i = 0; i < this.rows; i++) {
+      for (let j = 0; j < this.cols; j++) {
+        if (Math.floor(Math.random() * 4) === 1) {
+          gridCopy[i][j] = true;
+        }
+      }
+    }
+    this.setState({
+      gridFull: gridCopy,
+    });
+  };
+
+  playButton = () => {
+    clearInterval(this.intervalId);
+    this.intervalId = setInterval(this.play, this.speed);
+  };
+
+  play = () => {
+    let g = this.state.gridFull;
+    let g2 = arrayClone(this.state.gridFull);
+  };
+
+  componentDidMount() {
+    this.seed();
+    this.play();
   }
 
   render() {
@@ -33,15 +72,32 @@ class Main extends React.Component {
   }
 }
 
+class Box extends React.Component {
+  selectBox = () => {
+    this.props.selectBox(this.props.row, this.props.col);
+  };
+
+  render() {
+    return (
+      <div
+        className={this.props.boxClass}
+        id={this.props.id}
+        onClick={this.selectBox}
+      ></div>
+    );
+  }
+}
+
 class Grid extends React.Component {
   render() {
-    const width = this.prop.cols * 14;
-    const rowsArr = [];
-    let boxClass = "";
+    const width = this.props.cols * 16;
+    var rowsArr = [];
 
-    for (let i = 0; 0 < this.props.rows; i++) {
-      for (let j = 0; j < this.props.cols; j++) {
+    var boxClass = "";
+    for (var i = 0; i < this.props.rows; i++) {
+      for (var j = 0; j < this.props.cols; j++) {
         let boxId = i + "_" + j;
+
         boxClass = this.props.gridFull[i][j] ? "box on" : "box off";
         rowsArr.push(
           <Box
@@ -55,12 +111,17 @@ class Grid extends React.Component {
         );
       }
     }
+
     return (
       <div className="grid" style={{ width: width }}>
-        {{ rowsArr }}
+        {rowsArr}
       </div>
     );
   }
+}
+
+function arrayClone(arr) {
+  return JSON.parse(JSON.stringify(arr));
 }
 
 ReactDOM.render(
